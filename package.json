@@ -1,6 +1,6 @@
 {
-  "name": "draft-js-mention-plugin",
-  "version": "2.0.0-beta10",
+  "name": "draft-js-formula-plugin",
+  "version": "1.0.0",
   "description": "Mention Plugin for DraftJS",
   "author": {
     "name": "Nik Graf",
@@ -9,19 +9,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/draft-js-plugins/draft-js-plugins.git"
+    "url": "https://github.com/sabarnix/draft-js-formula-plugin.git"
   },
   "main": "lib/index.js",
-  "keywords": [
-    "editor",
-    "wysiwyg",
-    "draft",
-    "react",
-    "ux",
-    "components",
-    "widget",
-    "react-component"
-  ],
   "scripts": {
     "clean": "../node_modules/.bin/rimraf lib",
     "build": "npm run clean && npm run build:js && npm run build:css",
