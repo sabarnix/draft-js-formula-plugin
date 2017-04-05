@@ -37,8 +37,6 @@ export default (config = {}) => {
     mentionSuggestionsEntryAvatar: mentionSuggestionsEntryStyles.mentionSuggestionsEntryAvatar,
   };
 
-  console.log(defaultTheme);
-
   const callbacks = {
     keyBindingFn: undefined,
     handleKeyCommand: undefined,

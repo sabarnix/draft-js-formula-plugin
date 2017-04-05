@@ -236,12 +236,12 @@ export default class MentionSuggestions extends Component {
   onMentionSelect = (mention) => {
     // Note: This can happen in case a user typed @xxx (invalid mention) and
     // then hit Enter. Then the mention will be undefined.
-    if (!mention) {
-      return;
+    if (this.props.onAddMention) {
+      mention = this.props.onAddMention(mention);
     }
 
-    if (this.props.onAddMention) {
-      this.props.onAddMention(mention);
+    if (!mention) {
+      return;
     }
 
     this.closeDropdown();
