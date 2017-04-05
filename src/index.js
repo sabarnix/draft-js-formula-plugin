@@ -9,7 +9,8 @@ import {
   getDefaultKeyBinding,
   KeyBindingUtil,
   Modifier,
-} from 'draft-js'
+  convertFromRaw, convertToRaw,
+} from 'draft-js';
 import Mention from './Mention';
 import MentionSuggestions from './MentionSuggestions';
 import MentionSuggestionsPortal from './MentionSuggestionsPortal';
@@ -35,6 +36,8 @@ export default (config = {}) => {
     mentionSuggestionsEntryText: mentionSuggestionsEntryStyles.mentionSuggestionsEntryText,
     mentionSuggestionsEntryAvatar: mentionSuggestionsEntryStyles.mentionSuggestionsEntryAvatar,
   };
+
+  console.log(defaultTheme);
 
   const callbacks = {
     keyBindingFn: undefined,
@@ -100,6 +103,7 @@ export default (config = {}) => {
     entityMutability = 'IMMUTABLE',
     mentionTrigger = '@',
     mentionRegExp = defaultRegExp,
+    entryComponent = null,
   } = config;
   const mentionSearchProps = {
     ariaProps,
@@ -110,6 +114,7 @@ export default (config = {}) => {
     positionSuggestions,
     mentionTrigger,
     mentionPrefix,
+    entryComponent,
   };
   return {
     MentionSuggestions: decorateComponentWithProps(MentionSuggestions, mentionSearchProps),
@@ -194,7 +199,7 @@ export default (config = {}) => {
       return true;
     },
     onChange: (editorState) => {
-      
+
       const selection = editorState.getSelection();
 
       const startKey = selection.getStartKey();
@@ -287,6 +292,8 @@ export default (config = {}) => {
           focusOffset: selectionEnd
         }));
       }
+
+
 
       
 
