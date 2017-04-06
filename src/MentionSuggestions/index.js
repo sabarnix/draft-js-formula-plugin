@@ -228,9 +228,9 @@ export default class MentionSuggestions extends Component {
     const optionEle = this.popover.querySelectorAll('[role="option"]')[index];
     if(!optionEle) return;
     if(optionEle.offsetTop > (this.popover.scrollTop + (this.popover.offsetHeight - 10))) {
-      this.popover.scrollTop += optionEle.offsetHeight;
+      this.popover.scrollTop += (optionEle.offsetHeight + 10);
     } else if(optionEle.offsetTop < (this.popover.scrollTop + 10)) {
-      this.popover.scrollTop -= optionEle.offsetHeight;
+      this.popover.scrollTop -= (optionEle.offsetHeight + 10);
     }
   }
 
