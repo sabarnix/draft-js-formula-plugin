@@ -146,10 +146,10 @@ export default (config = {}) => {
     onTab: (keyboardEvent) => callbacks.onTab && callbacks.onTab(keyboardEvent),
     onUpArrow: (keyboardEvent) => callbacks.onUpArrow && callbacks.onUpArrow(keyboardEvent),
     onEscape: (keyboardEvent) => callbacks.onEscape && callbacks.onEscape(keyboardEvent),
-    handleReturn: (keyboardEvent) => callbacks.handleReturn && callbacks.handleReturn(keyboardEvent),
+    handleReturn: (keyboardEvent) => callbacks.handleReturn ? callbacks.handleReturn(keyboardEvent) : 'handled',
     handleBeforeInput: (chars, { getEditorState, setEditorState }) => {
       //console.log(getEditorState(), command.keyCode);
-            
+
       let editorState = getEditorState();
 
       const contentState = editorState.getCurrentContent();
@@ -290,10 +290,6 @@ export default (config = {}) => {
           focusOffset: selectionEnd
         }));
       }
-
-
-
-      
 
       if (callbacks.onChange) return callbacks.onChange(editorState);
       return editorState;

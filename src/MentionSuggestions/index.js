@@ -18,6 +18,8 @@ export default class MentionSuggestions extends Component {
     ]),
     entryComponent: PropTypes.func,
     onAddMention: PropTypes.func,
+    onSuggestionUpArrow: PropTypes.func,
+    onSuggestionDownArrow: PropTypes.func,
     suggestions: (props, propName, componentName) => {
       if (!List.isList(props[propName])) {
         return new Error(
@@ -30,7 +32,7 @@ export default class MentionSuggestions extends Component {
 
   state = {
     isActive: false,
-    focusedOptionIndex: 0,
+    focusedOptionIndex: 1,
   };
 
   componentWillMount() {
@@ -89,8 +91,6 @@ export default class MentionSuggestions extends Component {
   onEditorStateChange = (editorState) => {
     const searches = this.props.store.getAllSearches();
 
-    //console.log(searches.toJS());
-
     // if no search portal is active there is no need to show the popover
     if (searches.size === 0) {
       return editorState;
@@ -126,8 +126,6 @@ export default class MentionSuggestions extends Component {
     if (leaves.every((leave) => leave === undefined)) {
       return removeList();
     }
-
-    //console.log(leaves.toJS());
 
     // Checks that the cursor is after the @ character but still somewhere in
     // the word (search term). Setting it to allow the cursor to be left of
@@ -179,7 +177,7 @@ export default class MentionSuggestions extends Component {
     if (this.lastSelectionIsInsideWord === undefined ||
         !selectionIsInsideWord.equals(this.lastSelectionIsInsideWord)) {
       this.setState({
-        focusedOptionIndex: 0,
+        focusedOptionIndex: 1,
       });
     }
 
@@ -202,8 +200,11 @@ export default class MentionSuggestions extends Component {
 
   onDownArrow = (keyboardEvent) => {
     keyboardEvent.preventDefault();
-    const newIndex = this.state.focusedOptionIndex + 1;
-    this.onMentionFocus(newIndex >= this.props.suggestions.size ? 0 : newIndex);
+    let newIndex = this.state.focusedOptionIndex + 1;
+    newIndex = this.props.onSuggestionDownArrow ? this.props.onSuggestionDownArrow(newIndex) : newIndex;
+    newIndex = newIndex >= this.props.suggestions.filter(x => x).size ? (newIndex - 1) : newIndex;
+    this.onMentionFocus(newIndex);
+    this.adjustScroll(newIndex);
   };
 
   onTab = (keyboardEvent) => {
@@ -214,10 +215,24 @@ export default class MentionSuggestions extends Component {
   onUpArrow = (keyboardEvent) => {
     keyboardEvent.preventDefault();
     if (this.props.suggestions.size > 0) {
-      const newIndex = this.state.focusedOptionIndex - 1;
-      this.onMentionFocus(newIndex < 0 ? this.props.suggestions.size - 1 : newIndex);
+      let newIndex = this.state.focusedOptionIndex - 1;
+      newIndex = this.props.onSuggestionUpArrow ? this.props.onSuggestionUpArrow(newIndex) : newIndex;
+      newIndex = newIndex < 0 ? newIndex + 1 : newIndex;
+      this.onMentionFocus(newIndex);
+      this.adjustScroll(newIndex);
+
     }
   };
+
+  adjustScroll = (index) => {
+    const optionEle = this.popover.querySelectorAll('[role="option"]')[index];
+    if(!optionEle) return;
+    if(optionEle.offsetTop > (this.popover.scrollTop + (this.popover.offsetHeight - 10))) {
+      this.popover.scrollTop += optionEle.offsetHeight;
+    } else if(optionEle.offsetTop < (this.popover.scrollTop + 10)) {
+      this.popover.scrollTop -= optionEle.offsetHeight;
+    }
+  }
 
   onEscape = (keyboardEvent) => {
     keyboardEvent.preventDefault();
@@ -259,6 +274,7 @@ export default class MentionSuggestions extends Component {
     const descendant = `mention-option-${this.key}-${index}`;
     this.props.ariaProps.ariaActiveDescendantID = descendant;
     this.state.focusedOptionIndex = index;
+
 
     // to force a re-render of the outer component to change the aria props
     this.props.store.setEditorState(this.props.store.getEditorState());
@@ -335,6 +351,8 @@ export default class MentionSuggestions extends Component {
       positionSuggestions, // eslint-disable-line no-unused-vars
       mentionTrigger, // eslint-disable-line no-unused-vars
       mentionPrefix, // eslint-disable-line no-unused-vars
+      onSuggestionUpArrow, // eslint-disable-line no-unused-vars,
+      onSuggestionDownArrow, // eslint-disable-line no-unused-vars,
       ...elementProps } = this.props;
 
     return React.cloneElement(
@@ -346,7 +364,7 @@ export default class MentionSuggestions extends Component {
         id: `mentions-list-${this.key}`,
         ref: (element) => { this.popover = element; },
       },
-      this.props.suggestions.map((mention, index) => (
+      this.props.suggestions.map((mention, index) => {return mention && (
         <Entry
           key={mention.has('id') ? mention.get('id') : mention.get('name')}
           onMentionSelect={this.onMentionSelect}
@@ -359,7 +377,7 @@ export default class MentionSuggestions extends Component {
           searchValue={this.lastSearchValue}
           entryComponent={entryComponent || defaultEntryComponent}
         />
-      )).toJS()
+      )}).toJS()
     );
   }
 }
