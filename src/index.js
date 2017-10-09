@@ -147,8 +147,8 @@ export default (config = {}) => {
     onUpArrow: (keyboardEvent) => callbacks.onUpArrow && callbacks.onUpArrow(keyboardEvent),
     onEscape: (keyboardEvent) => callbacks.onEscape && callbacks.onEscape(keyboardEvent),
     handleReturn: (keyboardEvent) => callbacks.handleReturn ? callbacks.handleReturn(keyboardEvent) : 'handled',
-    handleBeforeInput: (chars, { getEditorState, setEditorState }) => {
-      //console.log(getEditorState(), command.keyCode);
+    handleBeforeInput: (chars) => {
+      const { getEditorState, setEditorState } = store;
 
       let editorState = getEditorState();
 
@@ -163,8 +163,8 @@ export default (config = {}) => {
       const currentContentBlock = contentState.getBlockForKey(anchorKey);
       const currentOffset = selectionState.getAnchorOffset();
 
-      if(chars === '[') {
-        let endSelection = new SelectionState({
+      if (chars === '[') {
+        const endSelection = new SelectionState({
           anchorKey: selectionState.getAnchorKey(),
           anchorOffset: selectionState.getAnchorOffset(),
           focusKey: selectionState.getFocusKey(),
@@ -187,17 +187,16 @@ export default (config = {}) => {
 
       const matchingPositions = getAllMatchPositions(plainText, regex);
 
-      if(matchingPositions.some((position) => currentOffset > position[0] && currentOffset < position[1])) {
+      if (matchingPositions.some((position) => currentOffset > position[0] && currentOffset < position[1])) {
         return true;
       }
 
       const operatorPattern = /(?:[-0-9 .%^&*()_+\"'\/])/;
-      return operatorPattern.test(chars)? false : 'handled';
+      return operatorPattern.test(chars) ? false : 'handled';
 
       return true;
     },
     onChange: (editorState) => {
-
       const selection = editorState.getSelection();
 
       const startKey = selection.getStartKey();
@@ -207,9 +206,9 @@ export default (config = {}) => {
       const prevOffset = startOffset - 1;
       const block = editorState.getCurrentContent().getBlockForKey(startKey);
       const characterList = block.getCharacterList();
-      
-      
-      if(selection.isCollapsed()) {
+
+
+      if (selection.isCollapsed()) {
         const prevChar = characterList.get(prevOffset);
         const nextChar = characterList.get(startOffset);
 
@@ -217,7 +216,7 @@ export default (config = {}) => {
           if (callbacks.onChange) return callbacks.onChange(editorState);
           return editorState;
         }
-        
+
         const prevEntity = prevChar.getEntity();
         const nextEntity = nextChar.getEntity();
         const entity = prevEntity === nextEntity && prevEntity;
@@ -230,7 +229,7 @@ export default (config = {}) => {
         let finalPrevOffset = prevOffset;
         let finalNextOffset = startOffset;
 
-        while(finalPrevOffset > 0) {
+        while (finalPrevOffset > 0) {
           finalPrevOffset--;
           const char = characterList.get(finalPrevOffset);
           if (char.getEntity() !== entity) {
@@ -240,7 +239,7 @@ export default (config = {}) => {
         }
 
         const blockLength = block.getLength();
-        while(finalNextOffset < blockLength) {
+        while (finalNextOffset < blockLength) {
           finalNextOffset++;
           const char = characterList.get(finalNextOffset);
           if (char.getEntity() !== entity) {
@@ -260,8 +259,8 @@ export default (config = {}) => {
 
         const startEntity = selectionStart && characterList.get(selectionStart) && characterList.get(selectionStart).getEntity();
 
-        if(startEntity) {
-          while(selectionStart > 0) {
+        if (startEntity) {
+          while (selectionStart > 0) {
             selectionStart--;
             const char = characterList.get(selectionStart);
             if (char.getEntity() !== startEntity) {
@@ -273,8 +272,8 @@ export default (config = {}) => {
 
         const endEntity = selectionEnd && characterList.get(selectionEnd) && characterList.get(selectionEnd).getEntity();
 
-        if(endEntity) {
-          while(selectionEnd > 0) {
+        if (endEntity) {
+          while (selectionEnd > 0) {
             selectionEnd++;
             const char = characterList.get(selectionEnd);
             if (char.getEntity() !== endEntity) {
