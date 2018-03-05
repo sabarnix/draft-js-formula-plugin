@@ -46,7 +46,7 @@ export default class MentionSuggestions extends Component {
       this.closeDropdown();
     }
     if (nextProps.suggestions.size >= 1 && !this.state.isActive) {
-      //this.openDropdown();
+      // this.openDropdown();
     }
   }
 
@@ -133,7 +133,7 @@ export default class MentionSuggestions extends Component {
     // the @ causes troubles due selection confusion.
     const plainText = editorState.getCurrentContent().getPlainText();
 
-    
+
     const regex = /\[(.*?)\]/g;
 
     const matchingPositions = getAllMatchPositions(plainText, regex);
@@ -141,7 +141,7 @@ export default class MentionSuggestions extends Component {
     // const selectionIsInsideWord = leaves
     //   .filter((leave) => leave !== undefined)
     //   .map(({ start, end }) => (
-    //     (anchorOffset > start) && anchorOffset < end && 
+    //     (anchorOffset > start) && anchorOffset < end &&
     //     matchingPositions.some((position) => (anchorOffset >= position[0] && anchorOffset <= position[1]))
     //   ));
     const selectionIsInsideWord = leaves
@@ -188,8 +188,8 @@ export default class MentionSuggestions extends Component {
   };
 
   onSearchChange = (editorState, selection, activeOffsetKey, lastActiveOffsetKey) => {
-    //const { word } = getSearchText(editorState, selection);
-    //const searchValue = word.substring(1, word.length);
+    // const { word } = getSearchText(editorState, selection);
+    // const searchValue = word.substring(1, word.length);
 
     const { searchValue } = getSearchText(editorState, selection);
 
@@ -203,7 +203,7 @@ export default class MentionSuggestions extends Component {
     keyboardEvent.preventDefault();
     let newIndex = this.state.focusedOptionIndex + 1;
     newIndex = this.props.onSuggestionDownArrow ? this.props.onSuggestionDownArrow(newIndex) : newIndex;
-    newIndex = newIndex >= this.props.suggestions.filter(x => x).size ? (newIndex - 1) : newIndex;
+    newIndex = newIndex >= this.props.suggestions.filter((x) => x).size ? (newIndex - 1) : newIndex;
     this.onMentionFocus(newIndex);
     this.adjustScroll(newIndex);
   };
@@ -221,19 +221,8 @@ export default class MentionSuggestions extends Component {
       newIndex = newIndex < 0 ? newIndex + 1 : newIndex;
       this.onMentionFocus(newIndex);
       this.adjustScroll(newIndex);
-
     }
   };
-
-  adjustScroll = (index) => {
-    const optionEle = this.popover.querySelectorAll('[role="option"]')[index];
-    if(!optionEle) return;
-    if(optionEle.offsetTop > (this.popover.scrollTop + (this.popover.offsetHeight - 10))) {
-      this.popover.scrollTop += (optionEle.offsetHeight + 10);
-    } else if(optionEle.offsetTop < (this.popover.scrollTop + 10)) {
-      this.popover.scrollTop -= (optionEle.offsetHeight + 10);
-    }
-  }
 
   onEscape = (keyboardEvent) => {
     keyboardEvent.preventDefault();
@@ -280,6 +269,15 @@ export default class MentionSuggestions extends Component {
     // to force a re-render of the outer component to change the aria props
     this.props.store.setEditorState(this.props.store.getEditorState());
   };
+
+  adjustScroll = (index) => {
+    const selectedItem = this.popover.querySelectorAll('div')[index];
+
+    if (!selectedItem) {
+      return;
+    }
+    this.popover.scrollTop = (selectedItem.offsetTop - (this.popover.offsetHeight / 2));
+  }
 
   commitSelection = () => {
     this.onMentionSelect(this.props.suggestions.get(this.state.focusedOptionIndex));
@@ -365,7 +363,7 @@ export default class MentionSuggestions extends Component {
         id: `mentions-list-${this.key}`,
         ref: (element) => { this.popover = element; },
       },
-      this.props.suggestions.map((mention, index) => {return mention && (
+      this.props.suggestions.map((mention, index) => mention && (
         <Entry
           key={mention.has('id') ? mention.get('id') : mention.get('name')}
           onMentionSelect={this.onMentionSelect}
@@ -378,7 +376,7 @@ export default class MentionSuggestions extends Component {
           searchValue={this.lastSearchValue}
           entryComponent={entryComponent || defaultEntryComponent}
         />
-      )}).toJS()
+      )).toJS()
     );
   }
 }
